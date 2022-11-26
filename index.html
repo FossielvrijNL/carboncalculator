@@ -1,0 +1,156 @@
+<html>
+    <head>
+        <title>Mortality Cost of Carbon calculator</title>
+    </head>
+    <body style="margin-left: 20%; margin-right: 20%">
+        <h1>Mortality Cost of Carbon calculator</h1>
+        <form>
+            <table>
+                <tr>
+                    <td>
+                        <label for="quantity">Quantity:</label><br>
+                        <input type="number" id="quantity" name="quantity" oninput="calculate()">
+                    </td>
+                    <td>
+                        <label for="unitfuel">Unit / fuel:</label><br>
+                        <select id="unitfuel" name="unitfuel" oninput="calculate()">
+                            <option value="kilogram coal">kilogram coal</option>
+                            <option value="kilogram CO2">kilogram CO2</option>
+                            <option value="liter diesel">liter diesel (B7 blend)</option>
+                            <option value="liter gasoline (benzine)">liter gasoline (benzine, E10 blend)</option>
+                            <option value="liter kerosine">liter kerosine</option>
+                            <option value="m3 natural gas">m3 natural gas</option>
+                            <option value="megawatthour coal">megawatthour coal</option>
+                            <option value="megawattyear coal">megawattyear coal</option>
+                            <option value="metric ton CO2">metric ton CO2</option>
+                            <option value="metric ton coal">metric ton coal</option>
+                            <option value="metric ton lignite (brown coal)">metric ton lignite (brown coal)</option>
+                            <option value="US gallon kerosine">US gallon kerosine</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><br></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h2>Result</h2>
+                        <p id="result"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><br></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h2>Background information</h2>
+                        <p>This calculator is based on the scientific research of Bressler.</p>
+                        <p>CO2 emission factors are taken from 
+                            <a href="https://www.co2emissiefactoren.nl/lijst-emissiefactoren/">https://www.co2emissiefactoren.nl/lijst-emissiefactoren/</a>.
+                            We use tank-to-wheel values; the actual emissions are worse because of the
+                            well-to-tank values. We may implement that in the future.
+                        </p>
+                        <p>The mortality cost as calculated by Bressler only accounts for heat casualties. 
+                            The real mortality cost is probably higher, because of the effects of 
+                            particulate matter and other pollution. Also, the emissions of aviation at high 
+                            altitutes cause more warming than emissions at ground level.</p>
+                        <p>Disclaimer: we did the best we could but it is possible that this calculator
+                            contains errors. If you think you found an error, please let us know by
+                            submitting an issue (or a pull request) on Github. Please include reliable sources.
+                            (The fossil industry is not a reliable source.)
+                        </p>
+                    </td>
+                </tr>
+            </table>     
+        </form>
+        <script>
+            function calculate() {
+                // Unit conversions
+                const kg2ton = 0.001;
+                const ton2kg = 1000;
+                const gallon2liter = 3.785411784;  // Source: https://en.wikipedia.org/wiki/Gallon
+                const hour2year = 24 * 365.25;
+                /*
+                    The Bressler factor is how many lives a kilogram of CO2 costs.
+                    https://twitter.com/DannyBressler1/status/1420769412437643264
+                    So, 1 life per 4434 metric ton CO2.
+                    We use kg, hence the ton2kg factor.
+                */
+                const bresslerfactor = 1 / (4434 * ton2kg);
+                /*
+                    CO2 emission factors.
+                    Source: https://www.co2emissiefactoren.nl/lijst-emissiefactoren/
+                */
+                l_benzine2kg_co2 = 2.141;
+                l_diesel2kg_co2 = 2.474;
+                l_kerosine2kg_co2 = 2.506;
+                const m3_gas2kg_co2 = 1.788;
+                const kg_coal2kg_co2 = 2.327;
+                const kg_lignite2kg_co2 = 2.02;
+                /*
+                    CO2 emission factors per megawatt.
+                    Source: https://ourworldindata.org/grapher/carbon-dioxide-emissions-factor
+                */
+                mWh_coal2kg_co2 = 403.20;
+                // Read the form fields
+                var quantity = document.getElementById("quantity").value.toLocaleString();
+                var unitfuel = document.getElementById("unitfuel").value;
+                document.getElementById("result").innerHTML = "Input: " + parseFloat(quantity).toLocaleString() + " " + unitfuel + "<br><br>";
+                // Calculate kilograms of CO2
+                switch (unitfuel) {
+                    case "kilogram coal":
+                        kg_co2 = quantity * kg_coal2kg_co2;
+                        break;
+                    case "kilogram CO2":
+                        kg_co2 = quantity;
+                        break;
+                    case "liter diesel":
+                        kg_co2 = quantity * l_diesel2kg_co2;
+                        break;
+                    case "liter gasoline (benzine)":
+                        kg_co2 = quantity * l_benzine2kg_co2;
+                        break;
+                    case "liter kerosine":
+                        kg_co2 = quantity * l_kerosine2kg_co2;
+                        break;
+                    case "m3 natural gas":
+                        kg_co2 = quantity * m3_gas2kg_co2;
+                        break;
+                    case "megawatthour coal":
+                        kg_co2 = quantity * mWh_coal2kg_co2;
+                        break;
+                    case "megawattyear coal":
+                        kg_co2 = quantity * mWh_coal2kg_co2 * hour2year;
+                        break;
+                    case "metric ton CO2":
+                        kg_co2 = quantity * ton2kg;
+                        break;
+                    case "metric ton coal":
+                        kg_co2 = quantity * kg_coal2kg_co2;
+                        break;
+                    case "metric ton lignite (brown coal)":
+                        kg_co2 = quantity * kg_lignite2kg_co2;
+                        break;
+                    case "US gallon kerosine":
+                        kg_co2 = quantity * gallon2liter * l_kerosine2kg_co2;
+                        break;
+                    default:
+                        document.getElementById("result").innerHTML += "Not yet implemented.";
+                        return;
+                }
+                mortality =  kg_co2 * bresslerfactor;
+                if (mortality > 1000) {
+                    mortality = Math.round(mortality);
+                } else if (mortality > 10) {
+                    mortality = Math.round(mortality*100)/100;
+                }
+                document.getElementById("result").innerHTML 
+                    += "Costs in human lives between 2020 and 2100: "
+                    + "<h2>"
+                    + mortality + " lives"
+                    + "</h2>"
+            }
+            calculate();
+        </script>
+    </body>
+</html>
