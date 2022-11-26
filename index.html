@@ -126,10 +126,10 @@
                         kg_co2 = quantity * ton2kg;
                         break;
                     case "metric ton coal":
-                        kg_co2 = quantity * kg_coal2kg_co2;
+                        kg_co2 = quantity * ton2kg * kg_coal2kg_co2;
                         break;
                     case "metric ton lignite (brown coal)":
-                        kg_co2 = quantity * kg_lignite2kg_co2;
+                        kg_co2 = quantity * ton2kg * kg_lignite2kg_co2;
                         break;
                     case "US gallon kerosine":
                         kg_co2 = quantity * gallon2liter * l_kerosine2kg_co2;
