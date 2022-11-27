@@ -1,0 +1,16 @@
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 20px;
+}
+
+input,select {
+    padding: 0.8em;
+}
+
+h2#mortality {
+    border: 2px solid black;
+    padding: 0.5em;
+    color:red;
+}

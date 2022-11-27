@@ -1,8 +1,9 @@
 <html>
     <head>
         <title>Mortality Cost of Carbon calculator</title>
+        <link rel="stylesheet" href="style.css">
     </head>
-    <body style="margin-left: 20%; margin-right: 20%">
+    <body>
         <h1>Mortality Cost of Carbon calculator</h1>
         <form>
             <table>
@@ -43,9 +44,11 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <h2>Background information</h2>
+                        <h2>What is this?</h2>
                         <p>This calculator is based on the 
-                            <a href="https://www.nature.com/articles/s41467-021-24487-w">scientific research of Daniel Bressler</a>.</p>
+                            <a href="https://www.nature.com/articles/s41467-021-24487-w">scientific research of Daniel Bressler</a>.
+                            He made an effort to express the effects of the climate crisis in the loss of human lives.
+                        </p>
                         <p>CO2 emission factors are taken from 
                             <a href="https://www.co2emissiefactoren.nl/lijst-emissiefactoren/">https://www.co2emissiefactoren.nl/lijst-emissiefactoren/</a>.
                             We use tank-to-wheel values; the actual emissions are worse because of the
@@ -147,7 +150,7 @@
                 }
                 document.getElementById("result").innerHTML 
                     += "Costs in human lives between 2020 and 2100: "
-                    + "<h2>"
+                    + "<h2 id='mortality'>"
                     + mortality + " lives"
                     + "</h2>"
             }
