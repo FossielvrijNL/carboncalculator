@@ -115,7 +115,7 @@
 
 
                 // Read the form fields
-                var quantity = document.getElementById("quantity").value.toLocaleString();
+                var quantity = document.getElementById("quantity").value;
                 var unitfuel = document.getElementById("unitfuel").value;
                 document.getElementById("result").innerHTML = "Input: " + parseFloat(quantity).toLocaleString() + " " + unitfuel + "<br><br>";
                 // Calculate kilograms of CO2
