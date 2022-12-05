@@ -20,6 +20,7 @@
                     <td>
                         <label for="unitfuel">Unit / fuel:</label><br>
                         <select id="unitfuel" name="unitfuel" oninput="calculate()">
+                            <option value="barrel oil">barrel of crude oil</option>
                             <option value="kilogram coal">kilogram coal</option>
                             <option value="kilogram CO2">kilogram CO2</option>
                             <option value="liter diesel">liter diesel (B7 blend)</option>
@@ -55,7 +56,8 @@
                             He made an effort to express the effects of the climate crisis in the loss of human lives.
                         </p>
                         <p>CO2 emission factors are taken from 
-                            <a href="https://www.co2emissiefactoren.nl/lijst-emissiefactoren/">https://www.co2emissiefactoren.nl/lijst-emissiefactoren/</a>.
+                            <a href="https://www.co2emissiefactoren.nl/lijst-emissiefactoren/">https://www.co2emissiefactoren.nl/lijst-emissiefactoren/</a>
+                            or other websites that seem reliable.
                             We use tank-to-wheel values; the actual emissions are worse because of the
                             well-to-tank values. We may implement that in the future.
                         </p>
@@ -94,9 +96,9 @@
                     CO2 emission factors.
                     Source: https://www.co2emissiefactoren.nl/lijst-emissiefactoren/
                 */
-                l_benzine2kg_co2 = 2.141;
-                l_diesel2kg_co2 = 2.474;
-                l_kerosine2kg_co2 = 2.506;
+                const l_benzine2kg_co2 = 2.141;
+                const l_diesel2kg_co2 = 2.474;
+                const l_kerosine2kg_co2 = 2.506;
                 const m3_gas2kg_co2 = 1.788;
                 const kg_coal2kg_co2 = 2.327;
                 const kg_lignite2kg_co2 = 2.02;
@@ -104,13 +106,23 @@
                     CO2 emission factors per megawatt.
                     Source: https://ourworldindata.org/grapher/carbon-dioxide-emissions-factor
                 */
-                mWh_coal2kg_co2 = 403.20;
+                const mWh_coal2kg_co2 = 403.20;
+                /*
+                    CO2 emission factor of barrel of cude oil
+                    Source: https://www.epa.gov/energy/greenhouse-gases-equivalencies-calculator-calculations-and-references
+                */
+                const barrel_oil2kg_co2 = 431.9;
+
+
                 // Read the form fields
                 var quantity = document.getElementById("quantity").value.toLocaleString();
                 var unitfuel = document.getElementById("unitfuel").value;
                 document.getElementById("result").innerHTML = "Input: " + parseFloat(quantity).toLocaleString() + " " + unitfuel + "<br><br>";
                 // Calculate kilograms of CO2
                 switch (unitfuel) {
+                    case "barrel oil":
+                        kg_co2 = quantity * barrel_oil2kg_co2;
+                        break;
                     case "kilogram coal":
                         kg_co2 = quantity * kg_coal2kg_co2;
                         break;
@@ -158,9 +170,12 @@
                     mortality = Math.round(mortality*100)/100;
                 }
                 document.getElementById("result").innerHTML 
-                    += "Costs in human lives between 2020 and 2100: "
+                    += "CO2 emitted: "
+                    + parseFloat(kg_co2).toLocaleString()
+                    + " kilogram<br><br>"
+                    + "Costs in human lives between 2020 and 2100: "
                     + "<h2 id='mortality'>"
-                    + mortality + " lives"
+                    + parseFloat(mortality).toLocaleString() + " lives"
                     + "</h2>"
             }
             calculate();
