@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv='Content-Security-Policy'
               content="default-src 'none';
-                       script-src 'self' 'unsafe-inline';
+                       script-src 'self' 'unsafe-inline' 'unsafe-eval';
                        style-src 'self' ">
         <title>Mortality Cost of Carbon calculator</title>
         <link rel="stylesheet" href="style.css">
@@ -15,7 +15,7 @@
                 <tr>
                     <td>
                         <label for="quantity">Quantity:</label><br>
-                        <input type="number" id="quantity" name="quantity" oninput="calculate()">
+                        <input type="text" id="quantity" name="quantity" oninput="calculate()">
                     </td>
                     <td>
                         <label for="unitfuel">Unit / fuel:</label><br>
@@ -116,9 +116,39 @@
 
 
                 // Read the form fields
-                var quantity = document.getElementById("quantity").value;
+                var quantity_input = document.getElementById("quantity").value;
                 var unitfuel = document.getElementById("unitfuel").value;
-                document.getElementById("result").innerHTML = "Input: " + parseFloat(quantity).toLocaleString() + " " + unitfuel + "<br><br>";
+                if (! quantity_input) {
+                    document.getElementById("result").innerHTML = "Please enter a quantity. May be a number or an expression such as 24*3600*365).<br><br>";
+                    return;
+                }
+                // Check whether input is a valid calculation expression
+                if (/^[0-9\.\+\-\*\/\(\)\s]+$/.test(quantity_input)) {
+                    try {
+                        var quantity = eval(quantity_input);
+                    } catch (error) {
+                        //document.getElementById("result").innerHTML = "Invalid input: " + quantity_input + "<br><br>";
+                        return;
+                    }
+                } else {
+                    document.getElementById("result").innerHTML = "Invalid input: " + quantity_input + "<br><br>";
+                    return;
+                }
+                if (quantity == quantity_input) {
+                    document.getElementById("result").innerHTML = "Input: "
+                                                                + quantity.toLocaleString()
+                                                                + " "
+                                                                + unitfuel
+                                                                + "<br><br>";
+                } else {
+                    document.getElementById("result").innerHTML = "Input: "
+                                                                + quantity_input
+                                                                + " = "
+                                                                + quantity.toLocaleString()
+                                                                + " "
+                                                                + unitfuel
+                                                                + "<br><br>";
+                }
                 // Calculate kilograms of CO2
                 switch (unitfuel) {
                     case "barrel oil":
@@ -176,7 +206,7 @@
                     + " kilogram<br><br>"
                     + "Costs in human lives between 2020 and 2100: "
                     + "<h2 id='mortality'>"
-                    + parseFloat(mortality).toLocaleString() + " lives"
+                    + mortality.toLocaleString(navigator.language, { maximumFractionDigits: 9 }) + " lives"
                     + "</h2>"
             }
             calculate();
